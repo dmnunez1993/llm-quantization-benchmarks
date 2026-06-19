@@ -1,0 +1,11 @@
+[project]
+name = "llm-quantization-benchmarks"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=3.0.3",
+    "torch>=2.12.1",
+    "tqdm>=4.68.3",
+]
