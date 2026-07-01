@@ -275,10 +275,8 @@ extern "C" __device__ long long final_index_from_pair(
 extern "C" __device__ float llvq_score_pair(
     const float* x,
     const int* golay_bits_table,
-    const int* golay_weight_table,
     const int* class_parity,
     const float* class_shell,
-    const int* class_even_weight,
     const int* class_f0_mags,
     const int* class_f1_mags,
     const int* class_f0_len,
@@ -294,9 +292,6 @@ extern "C" __device__ float llvq_score_pair(
     float projection = 0.0f;
 
     if (parity == 0) {
-        int weight = golay_weight_table[golay_index];
-        if (weight != class_even_weight[class_id]) return -LLVQ_INF_F;
-
         int selected0 = 0;
         int f0_mask = ((1 << 24) - 1) ^ golay_bits;
         int f0_len = class_f0_len[class_id];
@@ -382,10 +377,8 @@ extern "C" __global__ void llvq_quantize_kernel(
     float* best_score,
     long long* out_indices,
     const int* golay_bits_table,
-    const int* golay_weight_table,
     const int* class_parity,
     const float* class_shell,
-    const int* class_even_weight,
     const int* class_f0_mags,
     const int* class_f1_mags,
     const int* class_f0_len,
@@ -406,10 +399,13 @@ extern "C" __global__ void llvq_quantize_kernel(
     const long long* f1_values,
     const long long* odd_values,
     const long long* comb,
+    const int* valid_pair_class,
+    const int* valid_pair_golay,
+    const int* valid_pair_order,
     long long n,
     int n_classes,
     int n_golay,
-    int total_pairs,
+    int total_valid_pairs,
     int max_vals
 ) {
     int row = blockIdx.x;
@@ -421,16 +417,14 @@ extern "C" __global__ void llvq_quantize_kernel(
     int thread_best_order = 2147483647;
     const float* row_x = x + (long long)row * 24;
 
-    for (int pair = tid; pair < total_pairs; pair += blockDim.x) {
-        int class_id = pair / n_golay;
-        int golay_index = pair - class_id * n_golay;
+    for (int slot = tid; slot < total_valid_pairs; slot += blockDim.x) {
+        int class_id = valid_pair_class[slot];
+        int golay_index = valid_pair_golay[slot];
         float score = llvq_score_pair(
             row_x,
             golay_bits_table,
-            golay_weight_table,
             class_parity,
             class_shell,
-            class_even_weight,
             class_f0_mags,
             class_f1_mags,
             class_f0_len,
@@ -440,10 +434,10 @@ extern "C" __global__ void llvq_quantize_kernel(
             class_id,
             golay_index
         );
-        int order = golay_index * n_classes + class_id;
+        int order = valid_pair_order[slot];
         if (score > thread_best_score || (score == thread_best_score && order < thread_best_order)) {
             thread_best_score = score;
-            thread_best_pair = (long long)pair;
+            thread_best_pair = (long long)class_id * n_golay + golay_index;
             thread_best_order = order;
         }
     }
@@ -564,10 +558,8 @@ def quantize_lattice_cuda(
         _ptr_arg(best_score),
         _ptr_arg(indices),
         _ptr_arg(meta["golay_bits"]),
-        _ptr_arg(meta["golay_weight"]),
         _ptr_arg(meta["class_parity"]),
         _ptr_arg(meta["class_shell"]),
-        _ptr_arg(meta["class_even_weight"]),
         _ptr_arg(meta["class_f0_mags"]),
         _ptr_arg(meta["class_f1_mags"]),
         _ptr_arg(meta["class_f0_len"]),
@@ -588,10 +580,13 @@ def quantize_lattice_cuda(
         _ptr_arg(rank_meta["f1_values"]),
         _ptr_arg(rank_meta["odd_values"]),
         _ptr_arg(comb),
+        _ptr_arg(meta["valid_pair_class"]),
+        _ptr_arg(meta["valid_pair_golay"]),
+        _ptr_arg(meta["valid_pair_order"]),
         _value_arg(x.shape[0], ctypes.c_longlong),
         _value_arg(int(meta["n_classes"]), ctypes.c_int),
         _value_arg(int(meta["n_golay"]), ctypes.c_int),
-        _value_arg(int(meta["total_pairs"]), ctypes.c_int),
+        _value_arg(int(meta["total_valid_pairs"]), ctypes.c_int),
         _value_arg(int(rank_meta["max_vals"]), ctypes.c_int),
     ]
     kernel_params = (ctypes.c_void_p * len(args))(

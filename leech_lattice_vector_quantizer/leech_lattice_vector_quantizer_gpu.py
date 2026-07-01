@@ -264,19 +264,26 @@ class LeechLatticeVectorQuantizerGpu:
         local = self.decompose_local_index(ranked)
         return unrank_class_codeword(ranked.leader, local)
 
-    def dequantize_lattice(self, global_index: int | Sequence[int] | torch.Tensor) -> tuple[int, ...] | torch.Tensor:
+    def dequantize_lattice(
+        self,
+        global_index: int | Sequence[int] | torch.Tensor,
+        *,
+        check_bounds: bool = True,
+    ) -> tuple[int, ...] | torch.Tensor:
         """Return integer Leech representative(s) before the 1/sqrt(8) scale."""
         if not torch.is_tensor(global_index) and isinstance(global_index, int):
             return self.codeword(global_index)
 
         indices = torch.as_tensor(global_index, dtype=torch.long, device=self.device)
         output_shape = indices.shape
-        codewords = self._dequantize_lattice_cuda(indices.reshape(-1))
+        codewords = self._dequantize_lattice_cuda(indices.reshape(-1), check_bounds=check_bounds)
         return codewords.reshape(*output_shape, DIM)
 
     def dequantize_lattice_cuda(
         self,
         global_index: int | Sequence[int] | torch.Tensor,
+        *,
+        check_bounds: bool = True,
     ) -> tuple[int, ...] | torch.Tensor:
         """Return integer Leech representative(s) with the NVRTC CUDA kernel."""
         if not torch.is_tensor(global_index) and isinstance(global_index, int):
@@ -284,15 +291,20 @@ class LeechLatticeVectorQuantizerGpu:
 
         indices = torch.as_tensor(global_index, dtype=torch.long, device=self.device)
         output_shape = indices.shape
-        codewords = self._dequantize_lattice_cuda(indices.reshape(-1))
+        codewords = self._dequantize_lattice_cuda(indices.reshape(-1), check_bounds=check_bounds)
         return codewords.reshape(*output_shape, DIM)
 
-    def dequantize(self, global_index: int | Sequence[int] | torch.Tensor) -> tuple[float, ...] | torch.Tensor:
+    def dequantize(
+        self,
+        global_index: int | Sequence[int] | torch.Tensor,
+        *,
+        check_bounds: bool = True,
+    ) -> tuple[float, ...] | torch.Tensor:
         """Return scaled Leech lattice vector(s) in Lambda_24."""
         if not torch.is_tensor(global_index) and isinstance(global_index, int):
             return tuple(LATTICE_SCALE * value for value in self.dequantize_lattice(global_index))
 
-        codewords = self.dequantize_lattice(global_index)
+        codewords = self.dequantize_lattice(global_index, check_bounds=check_bounds)
         if not torch.is_tensor(codewords):
             return tuple(LATTICE_SCALE * value for value in codewords)
         return LATTICE_SCALE * codewords.to(self.dtype)
@@ -392,10 +404,22 @@ class LeechLatticeVectorQuantizerGpu:
 
         n_classes = len(parity)
         n_golay = len(self.golay_codewords)
+        valid_pair_class: list[int] = []
+        valid_pair_golay: list[int] = []
+        valid_pair_order: list[int] = []
+        for class_id, (class_parity, required_weight) in enumerate(zip(parity, even_weight)):
+            for golay_index, weight in enumerate(golay_weight):
+                if class_parity == 0 and weight != required_weight:
+                    continue
+                valid_pair_class.append(class_id)
+                valid_pair_golay.append(golay_index)
+                valid_pair_order.append(golay_index * n_classes + class_id)
+
         self._quantize_cuda_meta = {
             "n_classes": n_classes,
             "n_golay": n_golay,
             "total_pairs": n_classes * n_golay,
+            "total_valid_pairs": len(valid_pair_class),
             "golay_bits": torch.tensor(golay_bits, dtype=torch.int32, device=self.device),
             "golay_weight": torch.tensor(golay_weight, dtype=torch.int32, device=self.device),
             "class_parity": torch.tensor(parity, dtype=torch.int32, device=self.device),
@@ -407,15 +431,18 @@ class LeechLatticeVectorQuantizerGpu:
             "class_f1_len": torch.tensor(f1_len, dtype=torch.int32, device=self.device),
             "class_required": torch.tensor(required, dtype=torch.int32, device=self.device),
             "class_odd_leaders": torch.tensor(odd_leaders, dtype=torch.int32, device=self.device),
+            "valid_pair_class": torch.tensor(valid_pair_class, dtype=torch.int32, device=self.device),
+            "valid_pair_golay": torch.tensor(valid_pair_golay, dtype=torch.int32, device=self.device),
+            "valid_pair_order": torch.tensor(valid_pair_order, dtype=torch.int32, device=self.device),
         }
         return self._quantize_cuda_meta
 
-    def _dequantize_lattice_cuda(self, indices: torch.Tensor) -> torch.Tensor:
+    def _dequantize_lattice_cuda(self, indices: torch.Tensor, *, check_bounds: bool = True) -> torch.Tensor:
         if self.device.type != "cuda":
             raise ValueError("dequantize_lattice_cuda requires a CUDA device")
         if dequantize_lattice_cuda is None:
             raise RuntimeError("fused CUDA dequantizer is unavailable")
-        if ((indices < 0) | (indices >= self.total_count)).any():
+        if check_bounds and ((indices < 0) | (indices >= self.total_count)).any():
             raise IndexError("global index outside codebook range")
         meta = self._codeword_cuda_metadata()
         out = torch.empty((indices.shape[0], DIM), dtype=torch.long, device=self.device)
