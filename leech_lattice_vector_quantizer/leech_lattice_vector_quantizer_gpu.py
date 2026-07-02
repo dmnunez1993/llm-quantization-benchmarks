@@ -407,6 +407,7 @@ class LeechLatticeVectorQuantizerGpu:
         valid_pair_class: list[int] = []
         valid_pair_golay: list[int] = []
         valid_pair_order: list[int] = []
+        valid_pair_shell: list[int] = []
         for class_id, (class_parity, required_weight) in enumerate(zip(parity, even_weight)):
             for golay_index, weight in enumerate(golay_weight):
                 if class_parity == 0 and weight != required_weight:
@@ -414,12 +415,34 @@ class LeechLatticeVectorQuantizerGpu:
                 valid_pair_class.append(class_id)
                 valid_pair_golay.append(golay_index)
                 valid_pair_order.append(golay_index * n_classes + class_id)
+                valid_pair_shell.append(int(shell[class_id]))
+
+        min_shell = 2
+        n_shells = self.max_shell - min_shell + 1
+        shell_slot_start: list[int] = []
+        shell_slot_count: list[int] = []
+        for shell_id in range(min_shell, self.max_shell + 1):
+            start = len(valid_pair_shell)
+            try:
+                start = valid_pair_shell.index(shell_id)
+            except ValueError:
+                pass
+            count = sum(1 for item in valid_pair_shell if item == shell_id)
+            shell_slot_start.append(start)
+            shell_slot_count.append(count)
+        max_shell_tiles = max((count + 4096 - 1) // 4096 for count in shell_slot_count)
 
         self._quantize_cuda_meta = {
             "n_classes": n_classes,
             "n_golay": n_golay,
             "total_pairs": n_classes * n_golay,
             "total_valid_pairs": len(valid_pair_class),
+            "tile_size": 4096,
+            "tile_batch_threshold": 4096,
+            "prune_by_shell": True,
+            "min_shell": min_shell,
+            "n_shells": n_shells,
+            "max_shell_tiles": max_shell_tiles,
             "golay_bits": torch.tensor(golay_bits, dtype=torch.int32, device=self.device),
             "golay_weight": torch.tensor(golay_weight, dtype=torch.int32, device=self.device),
             "class_parity": torch.tensor(parity, dtype=torch.int32, device=self.device),
@@ -434,6 +457,9 @@ class LeechLatticeVectorQuantizerGpu:
             "valid_pair_class": torch.tensor(valid_pair_class, dtype=torch.int32, device=self.device),
             "valid_pair_golay": torch.tensor(valid_pair_golay, dtype=torch.int32, device=self.device),
             "valid_pair_order": torch.tensor(valid_pair_order, dtype=torch.int32, device=self.device),
+            "valid_pair_shell": torch.tensor(valid_pair_shell, dtype=torch.int32, device=self.device),
+            "shell_slot_start": torch.tensor(shell_slot_start, dtype=torch.int32, device=self.device),
+            "shell_slot_count": torch.tensor(shell_slot_count, dtype=torch.int32, device=self.device),
         }
         return self._quantize_cuda_meta
 
