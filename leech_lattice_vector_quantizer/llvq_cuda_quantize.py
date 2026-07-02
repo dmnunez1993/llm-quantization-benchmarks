@@ -523,7 +523,8 @@ extern "C" __global__ void llvq_quantize_tiles_kernel(
     int n_tiles,
     int min_shell,
     int n_shells,
-    int prune_by_shell
+    int prune_by_shell,
+    int ann_top_shells
 ) {
     int row = blockIdx.x;
     int tile = blockIdx.y;
@@ -541,27 +542,39 @@ extern "C" __global__ void llvq_quantize_tiles_kernel(
     bool active_shells[64];
     for (int i = 0; i < 64; ++i) active_shells[i] = true;
 
-    if (prune_by_shell != 0) {
+    if (ann_top_shells > 0 || prune_by_shell != 0) {
         float norm2 = 0.0f;
         for (int d = 0; d < 24; ++d) {
             float value = row_x[d];
             norm2 += value * value;
         }
         float norm = sqrtf(norm2);
-        float best = lower_bound_score[row];
+        float upper_bounds[64];
+        for (int si = 0; si < 64; ++si) {
+            if (si < n_shells) {
+                int shell = min_shell + si;
+                upper_bounds[si] = norm * sqrtf(2.0f * (float)shell) - (float)shell;
+            } else {
+                upper_bounds[si] = -LLVQ_INF_F;
+            }
+        }
         for (int si = 0; si < 64; ++si) {
             if (si >= n_shells) {
                 active_shells[si] = false;
+            } else if (ann_top_shells > 0) {
+                int higher = 0;
+                for (int sj = 0; sj < n_shells; ++sj) {
+                    if (upper_bounds[sj] > upper_bounds[si]) ++higher;
+                }
+                active_shells[si] = higher < ann_top_shells;
             } else {
-                int shell = min_shell + si;
-                float upper = norm * sqrtf(2.0f * (float)shell) - (float)shell;
-                active_shells[si] = upper >= best;
+                active_shells[si] = upper_bounds[si] >= lower_bound_score[row];
             }
         }
     }
 
     for (int slot = start + tid; slot < stop; slot += blockDim.x) {
-        if (prune_by_shell != 0) {
+        if (ann_top_shells > 0 || prune_by_shell != 0) {
             int shell_idx = valid_pair_shell[slot] - min_shell;
             if (shell_idx < 0 || shell_idx >= 64 || !active_shells[shell_idx]) continue;
         }
@@ -908,11 +921,12 @@ def quantize_lattice_cuda(
     tile_size = int(meta.get("tile_size", 4096))
     tile_batch_threshold = int(meta.get("tile_batch_threshold", 4096))
     prune_by_shell = bool(meta.get("prune_by_shell", True))
+    ann_top_shells = int(meta.get("ann_top_shells", 0))
     total_valid_pairs = int(meta["total_valid_pairs"])
     n_tiles = (total_valid_pairs + tile_size - 1) // tile_size
     if n_tiles > 1 and x.shape[0] <= tile_batch_threshold:
         lower_bound_score = best_score
-        if prune_by_shell:
+        if prune_by_shell and ann_top_shells <= 0:
             max_shell_tiles = int(meta["max_shell_tiles"])
             init_tile_count = x.shape[0] * max_shell_tiles
             init_tile_best_pair = torch.empty((init_tile_count,), dtype=torch.long, device=x.device)
@@ -1054,6 +1068,7 @@ def quantize_lattice_cuda(
             _value_arg(int(meta["min_shell"]), ctypes.c_int),
             _value_arg(int(meta["n_shells"]), ctypes.c_int),
             _value_arg(1 if prune_by_shell else 0, ctypes.c_int),
+            _value_arg(ann_top_shells, ctypes.c_int),
         ]
         tile_kernel_params = (ctypes.c_void_p * len(tile_args))(
             *[ctypes.cast(ctypes.pointer(arg), ctypes.c_void_p) for arg in tile_args]

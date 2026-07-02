@@ -440,6 +440,7 @@ class LeechLatticeVectorQuantizerGpu:
             "tile_size": 4096,
             "tile_batch_threshold": 4096,
             "prune_by_shell": True,
+            "ann_top_shells": 0,
             "min_shell": min_shell,
             "n_shells": n_shells,
             "max_shell_tiles": max_shell_tiles,
