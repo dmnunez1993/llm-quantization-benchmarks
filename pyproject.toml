@@ -5,9 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "huggingface-hub>=1.22.0",
     "ipykernel>=7.0.0",
     "matplotlib>=3.10.0",
     "pandas>=3.0.3",
+    "safetensors>=0.8.0",
     "scipy>=1.16.0",
     "torch>=2.12.1",
     "tqdm>=4.68.3",

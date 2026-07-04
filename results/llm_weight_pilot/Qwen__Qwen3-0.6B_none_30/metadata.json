@@ -1,0 +1,13 @@
+{
+  "repo_id": "Qwen/Qwen3-0.6B",
+  "filename": "model.safetensors",
+  "tensor_name": "model.layers.0.mlp.down_proj.weight",
+  "n_blocks": 30,
+  "dim": 24,
+  "normalization": "none",
+  "raw_weight_mean": 0.0013622055451075236,
+  "raw_weight_std": 0.024777541035812967,
+  "raw_block_rms_mean": 0.02422687611730943,
+  "raw_block_rms_min": 0.015888713418198575,
+  "raw_block_rms_max": 0.037310182626942884
+}
