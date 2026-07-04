@@ -119,9 +119,9 @@ For each metric and scenario, the minimum sample size per algorithm was calculat
 The minimum interesting differences were:
 
 \begin{itemize}
-    \item SQNR bits: 0.10 bits.
-    \item Quantize time: 0.001 seconds.
-    \item Dequantize time: 0.00005 seconds.
+    \item SQNR bits: 0.10 bits. This is small relative to the absolute SQNR level, but large enough to indicate a meaningful reconstruction-quality shift between algorithms.
+    \item Quantize time: 0.001 seconds. Encoding is the slower runtime operation in this benchmark, so a one-millisecond difference per vector would be practically noticeable when many vectors are quantized.
+    \item Dequantize time: 0.00005 seconds. Decode calls are short, so 50 microseconds is a meaningful latency change.
 \end{itemize}
 
 After collecting the final data, descriptive statistics were computed for each metric and algorithm, including mean, standard deviation, coefficient of variation, and 95\% confidence intervals. The global tests used were repeated-measures ANOVA and Friedman tests. ANOVA assumptions were checked using Shapiro-Wilk tests on repeated-measures ANOVA residuals, and Fligner-Killeen and Levene tests for equality of variances. Pairwise post-hoc comparisons were performed with Bonferroni correction over all planned metric comparisons.
