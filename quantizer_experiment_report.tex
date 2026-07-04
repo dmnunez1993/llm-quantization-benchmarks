@@ -126,7 +126,7 @@ The minimum interesting differences were:
     \item Dequantize time: 0.00005 seconds. Decode calls are short, so 50 microseconds is a meaningful latency change.
 \end{itemize}
 
-After collecting the final data, descriptive statistics were computed for each metric and algorithm, including mean, standard deviation, coefficient of variation, and 95\% confidence intervals. The global tests used were repeated-measures ANOVA and Friedman tests. The normality assumption was checked using Shapiro-Wilk tests on repeated-measures ANOVA residuals. Pairwise post-hoc comparisons were performed with Bonferroni correction over all planned metric comparisons.
+After collecting the final data, descriptive statistics were computed for each metric and algorithm, including mean, standard deviation, coefficient of variation, and 95\% confidence intervals. The global tests used were repeated-measures ANOVA tests. The normality assumption was checked using Shapiro-Wilk tests on repeated-measures ANOVA residuals. Pairwise post-hoc comparisons were performed with Bonferroni correction over all planned metric comparisons.
 
 \subsection{Available Hardware and Software}
 
@@ -220,7 +220,7 @@ QTIP bitshift & 0.008185 & 0.000118 & [0.008157, 0.008213] & 0.000092 & 0.000021
 
 \subsection{Statistical Tests}
 
-The global tests rejected the null hypothesis for all three primary metrics. Table~\ref{tab:globaltests} shows that both repeated-measures ANOVA and Friedman tests found strong evidence of algorithm differences.
+The repeated-measures ANOVA tests rejected the null hypothesis for all three primary metrics. Table~\ref{tab:globaltests} shows strong evidence of algorithm differences.
 
 \begin{table}[H]
 \centering
@@ -231,11 +231,8 @@ The global tests rejected the null hypothesis for all three primary metrics. Tab
 Metric & Test & Statistic & p-value \\
 \midrule
 SQNR bits & Repeated-measures ANOVA & 290.95 & $3.16 \times 10^{-50}$ \\
-SQNR bits & Friedman & 103.63 & $3.14 \times 10^{-23}$ \\
 Quantize seconds & Repeated-measures ANOVA & 49431.78 & $8.96 \times 10^{-198}$ \\
-Quantize seconds & Friedman & 140.00 & $3.98 \times 10^{-31}$ \\
 Dequantize seconds & Repeated-measures ANOVA & 127.23 & $4.79 \times 10^{-32}$ \\
-Dequantize seconds & Friedman & 136.11 & $2.77 \times 10^{-30}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -252,7 +249,7 @@ Eight of the nine pairwise comparisons were significant after Bonferroni correct
 
 \subsection{Normality Check}
 
-Table~\ref{tab:assumptions} summarizes the Shapiro-Wilk checks on repeated-measures ANOVA residuals. SQNR and quantization-time residuals passed the normality check, but dequantization-time residuals did not. Therefore, the repeated-measures ANOVA result for dequantization time should be interpreted with caution. The Friedman tests are important because they corroborate the same global conclusion without relying on normal residuals.
+Table~\ref{tab:assumptions} summarizes the Shapiro-Wilk checks on repeated-measures ANOVA residuals. SQNR and quantization-time residuals passed the normality check, but dequantization-time residuals did not. Therefore, the repeated-measures ANOVA result for dequantization time should be interpreted with caution.
 
 \begin{table}[H]
 \centering
@@ -275,7 +272,7 @@ The results show that there is no single best algorithm across all metrics for Q
 
 The random multi-layer sampling reduces the risk of first-layer bias, but the sample remains intentionally small compared with the full checkpoint. The results should therefore be interpreted as a controlled estimate on representative weight blocks, not as a complete full-model quantization benchmark.
 
-The Shapiro-Wilk check is an important limitation. Dequantization residuals violate the normality assumption, so the repeated-measures ANOVA result for dequantization time should be interpreted cautiously. For this reason, the Friedman test is treated as a robustness check. Since both ANOVA and Friedman agree that the algorithms differ, the main conclusion is stable. However, the exact ANOVA p-value for dequantization time should not be over-interpreted.
+The Shapiro-Wilk check is an important limitation. Dequantization residuals violate the normality assumption, so the repeated-measures ANOVA result for dequantization time should be interpreted cautiously. However, the effect is large and the descriptive ordering is clear. The exact ANOVA p-value for dequantization time should not be over-interpreted.
 
 \section{Conclusion}
 
