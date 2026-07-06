@@ -1,5 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1783345154.93362 "quantizer_experiment_report.tex" "quantizer_experiment_report.pdf" "quantizer_experiment_report" 1783345155.17681 0
+["pdflatex"] 1783345424.98418 "/home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex" "quantizer_experiment_report.pdf" "quantizer_experiment_report" 1783345425.22011 0
+  "/home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex" 1783345424.82075 23606 548d21fcf5bbee52d4554c31a2faacd4 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -95,12 +96,12 @@
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1777593600 43785 66587115382950aca692b5f6e3c2fb74 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1781075933 288875 901cd4bbf4b12b5e1bf729e71f403ca5 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1781075914 2299045 e519890c707a0032201c13f9accf508e ""
-  "quantizer_experiment_report.aux" 1783345155.12922 5888 40d1f9640bae2630babf8bf2248b09c7 "pdflatex"
-  "quantizer_experiment_report.out" 1783345155.12922 3241 81779943bd4b0abfb03100d7f3b458b3 "pdflatex"
-  "quantizer_experiment_report.tex" 1783345028.10687 23606 548d21fcf5bbee52d4554c31a2faacd4 ""
-  "report_assets/final_metric_boxplots.pdf" 1783345144.51844 22313 77aa2f27e4b670d29d6d2f3dd3753ad2 ""
-  "report_assets/homoscedasticity_residuals_vs_fitted.pdf" 1783345145.38825 32135 5e99591a0b27850d055635625e64485f ""
-  "report_assets/shapiro_residual_qq_plots.pdf" 1783345144.95003 23982 e61b6b66b7fe5ccaa8c70a1c90ea45f6 ""
+  "quantizer_experiment_report.aux" 1783345425.1802 5888 40d1f9640bae2630babf8bf2248b09c7 "pdflatex"
+  "quantizer_experiment_report.out" 1783345425.18096 3241 81779943bd4b0abfb03100d7f3b458b3 "pdflatex"
+  "quantizer_experiment_report.tex" 1783345424.82075 23606 548d21fcf5bbee52d4554c31a2faacd4 ""
+  "report_assets/final_metric_boxplots.pdf" 1783345172.6238 22313 0b810595aa946db7fa497964ee8dff7b ""
+  "report_assets/homoscedasticity_residuals_vs_fitted.pdf" 1783345173.79925 32135 8b541d7381d51ca5c47509f39a3ea0d3 ""
+  "report_assets/shapiro_residual_qq_plots.pdf" 1783345173.19119 23982 a42a21506f76fd6ee25c70beff6a1669 ""
   (generated)
   "quantizer_experiment_report.aux"
   "quantizer_experiment_report.log"
