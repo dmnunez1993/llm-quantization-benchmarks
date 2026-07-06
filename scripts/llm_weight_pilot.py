@@ -29,6 +29,8 @@ TARGET_BITS_PER_DIM = 2.0
 LEECH_MAX_SHELL = 13
 QTIP_CONFIG = dict(L=8, K=int(TARGET_BITS_PER_DIM), V=1, tlut_bits=8, decode_mode="quantlut")
 QTIP_GIT_URL = "https://github.com/Cornell-RelaxML/qtip.git"
+QUIP_SHARP_GIT_URL = "https://github.com/Cornell-RelaxML/quip-sharp.git"
+QUIP_SHARP_CODEBOOK = "E8P12"
 
 
 @dataclass
@@ -154,6 +156,16 @@ def ensure_qtip_repo(repo_path: Path, auto_clone: bool = True) -> Path:
     return repo_path
 
 
+def ensure_quip_sharp_repo(repo_path: Path, auto_clone: bool = True) -> Path:
+    if repo_path.exists():
+        return repo_path
+    if not auto_clone:
+        raise FileNotFoundError(repo_path)
+    repo_path.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["git", "clone", "--depth", "1", QUIP_SHARP_GIT_URL, str(repo_path)], check=True)
+    return repo_path
+
+
 def load_qtip_bitshift_module(qtip_repo: Path):
     sys.modules.setdefault("lib", types.ModuleType("lib"))
     codebook_stub = types.ModuleType("lib.codebook")
@@ -220,6 +232,33 @@ class QTIPQuantizer:
         return recon.detach().cpu().numpy().astype(np.float32)
 
 
+class QuipSharpE8Quantizer:
+    def __init__(self, repo_path: Path, codebook_name: str = QUIP_SHARP_CODEBOOK):
+        ensure_quip_sharp_repo(repo_path)
+        from leech_lattice_vector_quantizer.gaussian_baseline_quantizers import load_quip_codebook_class
+
+        Codebook = load_quip_codebook_class(ROOT, codebook_name)
+        self.codebook_name = codebook_name
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.backend = "gpu" if self.device.type == "cuda" else "cpu"
+        self.codebook = Codebook(inference=False).to(self.device)
+        self.rate = 2.0
+
+    def encode_normalized(self, samples: np.ndarray):
+        if samples.shape[-1] % 8 != 0:
+            raise ValueError("QuIP# E8P12 expects rows with dimension divisible by 8")
+        blocks = torch.as_tensor(samples.reshape(-1, 8), dtype=torch.float32, device=self.device)
+        with torch.no_grad():
+            _, indices = self.codebook.quantize(blocks, return_idx=True)
+        return indices.reshape(samples.shape[0], samples.shape[1] // 8).contiguous()
+
+    def decode_normalized(self, indices) -> np.ndarray:
+        indices = indices.to(self.device) if torch.is_tensor(indices) else torch.as_tensor(indices, device=self.device)
+        with torch.no_grad():
+            recon = self.codebook.grid[indices.reshape(-1).long()]
+        return recon.reshape(indices.shape[0], indices.shape[1] * 8).detach().cpu().numpy().astype(np.float32)
+
+
 def load_weight_blocks(
     repo_id: str,
     filename: str,
@@ -261,9 +300,11 @@ def load_weight_blocks(
 
 def make_quantizers() -> list[dict[str, object]]:
     qtip_repo = ensure_qtip_repo(ROOT / "third_party" / "qtip")
+    quip_sharp_repo = ensure_quip_sharp_repo(ROOT / "third_party" / "quip-sharp")
     leech = LeechQuantizer()
     uniform = UniformScalarQuantizer(bits=2)
     qtip = QTIPQuantizer(qtip_repo, QTIP_CONFIG)
+    quip_sharp = QuipSharpE8Quantizer(quip_sharp_repo, QUIP_SHARP_CODEBOOK)
     return [
         {
             "method": f"Leech Lattice Vector Quantization ({leech.backend})",
@@ -282,6 +323,12 @@ def make_quantizers() -> list[dict[str, object]]:
             "rate": qtip.rate,
             "encode": qtip.encode_normalized,
             "decode": qtip.decode_normalized,
+        },
+        {
+            "method": f"QuIP# {QUIP_SHARP_CODEBOOK} ({quip_sharp.backend})",
+            "rate": quip_sharp.rate,
+            "encode": quip_sharp.encode_normalized,
+            "decode": quip_sharp.decode_normalized,
         },
     ]
 

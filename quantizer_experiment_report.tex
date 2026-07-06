@@ -22,12 +22,13 @@ Vector quantization is a compression method in which a real-valued vector is rep
 
 This experiment studies vector quantization in a controlled 24-dimensional setting. Each algorithm receives the same input vectors and is constrained to an effective rate of 2 bits per dimension. The goal is not only to determine which method reconstructs vectors most accurately, but also to determine the practical cost of using each method. For this reason, the experiment evaluates three dependent variables: reconstruction quality, quantization time, and dequantization time.
 
-The three algorithms compared are:
+The four algorithms compared are:
 
 \begin{itemize}
     \item \textbf{Leech Lattice Vector Quantization}: a lattice-based vector quantizer built on the 24-dimensional Leech lattice. The experiment uses 24-dimensional input blocks because the Leech lattice is defined in $\mathbb{R}^{24}$, so each block can be treated as one lattice-quantized vector. This dimension is also mathematically important: the Leech lattice achieves the optimal sphere packing density in 24 dimensions~\cite{sphere24}, and recent Leech Lattice Vector Quantization work uses its symmetry, shell structure, indexing, and search procedures to quantize without materializing a full unstructured codebook~\cite{llvq}. In this experiment, the finite codebook is the union of Leech lattice shells up to shell 13. Shell 13 is used because the cumulative shell count requires 48 index bits, which gives exactly $48/24=2$ bits per dimension.
     \item \textbf{Uniform scalar 2-bit}: a simple coordinate-wise quantizer. Each coordinate is rounded independently to one of a small number of uniformly spaced levels. This method is simple and fast, but it does not use relationships between coordinates.
     \item \textbf{QTIP bitshift}: an additional quantization algorithm based on the bitshift codebook component from QTIP, which stands for Quantization with Trellises and Incoherence Processing~\cite{qtip}. QTIP uses trellis-coded quantization to support very high-dimensional quantization, and introduces a hardware-efficient bitshift trellis for fast decoding.
+    \item \textbf{QuIP\# E8P12}: an additional 2-bit vector quantizer based on the QuIP\# E8 lattice codebook~\cite{quipsharp}. The E8P12 codebook quantizes 8-dimensional blocks with 16-bit indices, so each 24-dimensional experimental block is represented by three E8P12 indices for an effective rate of 2 bits per dimension.
 \end{itemize}
 
 The main research question is:
@@ -42,7 +43,7 @@ The expected trade-off is that a structured vector quantizer such as Leech Latti
 
 \subsection{Variables}
 
-The independent variable is the quantization algorithm, with three levels: Leech Lattice Vector Quantization, Uniform scalar 2-bit, and QTIP bitshift. The dependent variables are SQNR bits, quantize seconds, and dequantize seconds.
+The independent variable is the quantization algorithm, with four levels: Leech Lattice Vector Quantization, Uniform scalar 2-bit, QTIP bitshift, and QuIP\# E8P12. The dependent variables are SQNR bits, quantize seconds, and dequantize seconds.
 
 \subsubsection{SQNR bits}
 
@@ -77,7 +78,7 @@ These three metrics were selected because they correspond to the practical trade
 For each metric, the global ANOVA-style hypothesis is:
 
 \[
-H_0: \mu_1 = \mu_2 = \mu_3
+H_0: \mu_1 = \mu_2 = \mu_3 = \mu_4
 \]
 
 \[
@@ -95,8 +96,8 @@ The Leech lattice is intrinsically 24-dimensional, so each experimental block us
 The experiment was conducted in two phases:
 
 \begin{enumerate}
-    \item \textbf{Pilot experiment}: 30 paired blocks were collected. In each block, the same vector was evaluated by all three algorithms.
-    \item \textbf{Final experiment}: the final number of paired blocks was chosen using the pilot-based sample-size calculation described below. The final sample covered 70 weight blocks from 26 distinct down-projection layers.
+    \item \textbf{Pilot experiment}: 30 paired blocks were collected. In each block, the same vector was evaluated by all four algorithms.
+    \item \textbf{Final experiment}: the final number of paired blocks was chosen using the pilot-based sample-size calculation described below. The final sample covered 67 weight blocks from 24 distinct down-projection layers.
 \end{enumerate}
 
 Each block consisted of one vector evaluated by every algorithm. This creates a paired design: all algorithms are compared on the same input vectors. The order of algorithms was randomized during timing to reduce ordering effects. Before timing, each algorithm was warmed up for 5 iterations. For GPU timing, CUDA synchronization was performed before and after each measured call, so asynchronous CUDA execution would not contaminate timing measurements.
@@ -109,7 +110,7 @@ Each CSV row records the phase, block id, sampled weight tensor, layer, tensor-l
 
 \section{Data Analysis Protocol}
 
-First, the pilot data was used to estimate the within-algorithm variance for each metric. A power calculation for a three-algorithm mean comparison was then performed. Two effect scenarios were evaluated:
+First, the pilot data was used to estimate the within-algorithm variance for each metric. A power calculation for a four-algorithm mean comparison was then performed. Two effect scenarios were evaluated:
 
 \begin{itemize}
     \item \textbf{Two levels symmetric}: two algorithms differ symmetrically around the grand mean.
@@ -147,7 +148,7 @@ The experiment was executed on the following machine:
 
 \subsection{Sample Size Calculation}
 
-Table~\ref{tab:samplesize} shows the pilot-based sample-size calculation on randomly sampled Qwen3-0.6B weight blocks. The largest required sample size was 70 observations per algorithm, coming from the SQNR metric under the two-level symmetric scenario. Therefore, the final experiment used 70 paired blocks.
+Table~\ref{tab:samplesize} shows the pilot-based sample-size calculation on randomly sampled Qwen3-0.6B weight blocks. The largest required sample size was 67 observations per algorithm, coming from the SQNR metric under the two-level symmetric scenario. Therefore, the final experiment used 67 paired blocks.
 
 This sample size is small relative to the full model because Qwen3-0.6B contains many millions of weights. Evaluating every possible 24-dimensional block would turn the study into a much larger full-checkpoint benchmark and would be expensive for the exact Leech lattice quantizer and the QTIP baseline. The study therefore uses a pilot-powered random sample of blocks as a controlled estimate of behavior on model weights, rather than a full census of the checkpoint.
 
@@ -159,28 +160,28 @@ This sample size is small relative to the full model because Qwen3-0.6B contains
 \toprule
 Metric & Scenario & Pilot SD & Min. diff. & Required $n$ \\
 \midrule
-SQNR bits & Two levels symmetric & 0.188140 & 0.10000 & 70 \\
-SQNR bits & One versus rest & 0.188140 & 0.10000 & 53 \\
-Quantize seconds & Two levels symmetric & 0.000148 & 0.00100 & 2 \\
-Quantize seconds & One versus rest & 0.000148 & 0.00100 & 2 \\
-Dequantize seconds & Two levels symmetric & 0.000073 & 0.00005 & 42 \\
-Dequantize seconds & One versus rest & 0.000073 & 0.00005 & 32 \\
+SQNR bits & Two levels symmetric & 0.173003 & 0.10000 & 67 \\
+SQNR bits & One versus rest & 0.173003 & 0.10000 & 45 \\
+Quantize seconds & Two levels symmetric & 0.000253 & 0.00100 & 3 \\
+Quantize seconds & One versus rest & 0.000253 & 0.00100 & 3 \\
+Dequantize seconds & Two levels symmetric & 0.000054 & 0.00005 & 27 \\
+Dequantize seconds & One versus rest & 0.000054 & 0.00005 & 19 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsection{Descriptive Results}
 
-The final experiment collected 70 paired Qwen3-0.6B weight blocks for each algorithm. These blocks were randomly sampled from 26 distinct MLP down-projection layers. Figure~\ref{fig:boxplots} shows the distributions of the main metrics.
+The final experiment collected 67 paired Qwen3-0.6B weight blocks for each algorithm. These blocks were randomly sampled from 24 distinct MLP down-projection layers. Figure~\ref{fig:boxplots} shows the distributions of the main metrics.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{report_assets/final_metric_boxplots.pdf}
-\caption{Final metric distributions for the three algorithms. Black points show the mean with 95\% confidence intervals.}
+\caption{Final metric distributions for the four algorithms. Black points show the mean with 95\% confidence intervals.}
 \label{fig:boxplots}
 \end{figure}
 
-Table~\ref{tab:quality} summarizes reconstruction quality. Leech Lattice Vector Quantization achieved the best reconstruction quality, with the highest SQNR bits.
+Table~\ref{tab:quality} summarizes reconstruction quality. Leech Lattice Vector Quantization achieved the best reconstruction quality, with the highest SQNR bits, followed by QuIP\# E8P12.
 
 \begin{table}[H]
 \centering
@@ -191,9 +192,10 @@ Table~\ref{tab:quality} summarizes reconstruction quality. Leech Lattice Vector 
 \toprule
 Algorithm & SQNR mean & SQNR SD & SQNR 95\% CI & Coef. variation \\
 \midrule
-Leech Lattice Vector Quantization & 1.940660 & 0.069050 & [1.924196, 1.957125] & 0.035581 \\
-Uniform scalar 2-bit & 1.414538 & 0.221851 & [1.361640, 1.467437] & 0.156836 \\
-QTIP bitshift & 1.352473 & 0.237495 & [1.295844, 1.409101] & 0.175600 \\
+Leech Lattice Vector Quantization & 1.937313 & 0.065726 & [1.921281, 1.953345] & 0.033927 \\
+QuIP\# E8P12 & 1.783790 & 0.121918 & [1.754052, 1.813528] & 0.068348 \\
+Uniform scalar 2-bit & 1.444994 & 0.256908 & [1.382329, 1.507659] & 0.177791 \\
+QTIP bitshift & 1.392786 & 0.236477 & [1.335105, 1.450468] & 0.169787 \\
 \bottomrule
 \end{tabular}
 }
@@ -210,9 +212,10 @@ Table~\ref{tab:time} summarizes runtime. Uniform scalar quantization was the fas
 \toprule
 Algorithm & Quantize mean (s) & Quantize SD & Quantize 95\% CI & Dequantize mean (s) & Dequantize SD & Dequantize 95\% CI \\
 \midrule
-Uniform scalar 2-bit & 0.000084 & 0.000052 & [0.000072, 0.000097] & 0.000044 & 0.000002 & [0.000044, 0.000044] \\
-Leech Lattice Vector Quantization & 0.001353 & 0.000254 & [0.001292, 0.001413] & 0.000180 & 0.000086 & [0.000160, 0.000201] \\
-QTIP bitshift & 0.008185 & 0.000118 & [0.008157, 0.008213] & 0.000092 & 0.000021 & [0.000087, 0.000097] \\
+Uniform scalar 2-bit & 0.000112 & 0.000059 & [0.000098, 0.000127] & 0.000050 & 0.000020 & [0.000045, 0.000054] \\
+QuIP\# E8P12 & 0.001289 & 0.000183 & [0.001244, 0.001333] & 0.000074 & 0.000005 & [0.000073, 0.000076] \\
+Leech Lattice Vector Quantization & 0.001409 & 0.000241 & [0.001350, 0.001468] & 0.000249 & 0.000116 & [0.000220, 0.000277] \\
+QTIP bitshift & 0.008469 & 0.000260 & [0.008406, 0.008533] & 0.000120 & 0.000053 & [0.000107, 0.000133] \\
 \bottomrule
 \end{tabular}
 }
@@ -230,9 +233,9 @@ The repeated-measures ANOVA tests rejected the null hypothesis for all three pri
 \toprule
 Metric & Test & Statistic & p-value \\
 \midrule
-SQNR bits & Repeated-measures ANOVA & 290.95 & $3.16 \times 10^{-50}$ \\
-Quantize seconds & Repeated-measures ANOVA & 49431.78 & $8.96 \times 10^{-198}$ \\
-Dequantize seconds & Repeated-measures ANOVA & 127.23 & $4.79 \times 10^{-32}$ \\
+SQNR bits & Repeated-measures ANOVA & 164.90 & $1.37 \times 10^{-53}$ \\
+Quantize seconds & Repeated-measures ANOVA & 27469.27 & $4.34 \times 10^{-259}$ \\
+Dequantize seconds & Repeated-measures ANOVA & 124.96 & $1.91 \times 10^{-45}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -240,16 +243,16 @@ Dequantize seconds & Repeated-measures ANOVA & 127.23 & $4.79 \times 10^{-32}$ \
 The post-hoc comparisons showed the following ordering:
 
 \begin{itemize}
-    \item \textbf{SQNR bits}: Leech Lattice Vector Quantization $>$ Uniform and Leech Lattice Vector Quantization $>$ QTIP. Uniform had a higher mean than QTIP, but that pairwise difference was not significant after Bonferroni correction.
-    \item \textbf{Quantize time}: Uniform $<$ Leech Lattice Vector Quantization $<$ QTIP.
-    \item \textbf{Dequantize time}: Uniform $<$ QTIP $<$ Leech Lattice Vector Quantization.
+    \item \textbf{SQNR bits}: Leech Lattice Vector Quantization $>$ QuIP\# $>$ Uniform and QuIP\# $>$ QTIP. Uniform had a higher mean than QTIP, but that pairwise difference was not significant after Bonferroni correction.
+    \item \textbf{Quantize time}: Uniform $<$ QuIP\# $<$ Leech Lattice Vector Quantization $<$ QTIP.
+    \item \textbf{Dequantize time}: Uniform $<$ QuIP\# $<$ QTIP $<$ Leech Lattice Vector Quantization.
 \end{itemize}
 
-Eight of the nine pairwise comparisons were significant after Bonferroni correction. The adjusted alpha was 0.005556. The only non-significant comparison was Uniform scalar 2-bit versus QTIP bitshift for SQNR bits.
+Seventeen of the eighteen pairwise comparisons were significant after Bonferroni correction. The adjusted alpha was 0.002778. The only non-significant comparison was Uniform scalar 2-bit versus QTIP bitshift for SQNR bits.
 
 \subsection{Normality Check}
 
-Table~\ref{tab:assumptions} summarizes the Shapiro-Wilk checks on repeated-measures ANOVA residuals. SQNR and quantization-time residuals passed the normality check, but dequantization-time residuals did not. Therefore, the repeated-measures ANOVA result for dequantization time should be interpreted with caution.
+Table~\ref{tab:assumptions} summarizes the Shapiro-Wilk checks on repeated-measures ANOVA residuals. SQNR residuals passed the normality check, but quantization-time and dequantization-time residuals did not. Therefore, the repeated-measures ANOVA results for timing should be interpreted with caution.
 
 \begin{table}[H]
 \centering
@@ -259,26 +262,26 @@ Table~\ref{tab:assumptions} summarizes the Shapiro-Wilk checks on repeated-measu
 \toprule
 Metric & Test & p-value & Passes $\alpha=0.05$ \\
 \midrule
-SQNR bits & Shapiro-Wilk residual normality & 0.3644 & Yes \\
-Quantize seconds & Shapiro-Wilk residual normality & 0.0946 & Yes \\
-Dequantize seconds & Shapiro-Wilk residual normality & $8.31 \times 10^{-22}$ & No \\
+SQNR bits & Shapiro-Wilk residual normality & 0.8389 & Yes \\
+Quantize seconds & Shapiro-Wilk residual normality & 0.000107 & No \\
+Dequantize seconds & Shapiro-Wilk residual normality & $6.66 \times 10^{-16}$ & No \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \section{Discussion}
 
-The results show that there is no single best algorithm across all metrics for Qwen3-0.6B weight blocks. Leech Lattice Vector Quantization is the best choice when reconstruction quality is the priority. It achieved the highest SQNR and was significantly better than both scalar quantization and QTIP bitshift. However, this quality comes with higher runtime cost. Uniform scalar quantization was much faster in both quantization and dequantization, but its reconstruction quality was lower. QTIP bitshift did not improve SQNR in this configuration: its SQNR mean was slightly below uniform scalar quantization, and the SQNR difference between those two methods was not significant after correction. QTIP did, however, dequantize faster than Leech Lattice Vector Quantization.
+The results show that there is no single best algorithm across all metrics for Qwen3-0.6B weight blocks. Leech Lattice Vector Quantization is the best choice when reconstruction quality is the priority. It achieved the highest SQNR and was significantly better than QuIP\#, scalar quantization, and QTIP bitshift. QuIP\# E8P12 was the second-best method for reconstruction quality, significantly improving on both scalar quantization and QTIP bitshift. However, the higher-quality vector quantizers came with higher runtime cost. Uniform scalar quantization was fastest for both quantization and dequantization, while QuIP\# was second fastest for both timing metrics. QTIP bitshift did not improve SQNR in this configuration: its SQNR mean was slightly below uniform scalar quantization, and the SQNR difference between those two methods was not significant after correction.
 
 The random multi-layer sampling reduces the risk of first-layer bias, but the sample remains intentionally small compared with the full checkpoint. The results should therefore be interpreted as a controlled estimate on representative weight blocks, not as a complete full-model quantization benchmark.
 
-The Shapiro-Wilk check is an important limitation. Dequantization residuals violate the normality assumption, so the repeated-measures ANOVA result for dequantization time should be interpreted cautiously. However, the effect is large and the descriptive ordering is clear. The exact ANOVA p-value for dequantization time should not be over-interpreted.
+The Shapiro-Wilk check is an important limitation. Quantization-time and dequantization-time residuals violate the normality assumption, so the repeated-measures ANOVA results for timing should be interpreted cautiously. However, the timing effects are large and the descriptive ordering is clear. The exact ANOVA p-values for timing should not be over-interpreted.
 
 \section{Conclusion}
 
-This experiment compared three 2-bit quantization algorithms on actual Qwen3-0.6B weight blocks under a controlled paired design. The final sample size was calculated from a random multi-layer weight-block pilot study, resulting in 70 paired observations.
+This experiment compared four 2-bit quantization algorithms on actual Qwen3-0.6B weight blocks under a controlled paired design. The final sample size was calculated from a random multi-layer weight-block pilot study, resulting in 67 paired observations.
 
-Leech Lattice Vector Quantization produced the best reconstruction quality, with SQNR mean 1.941 bits. Uniform scalar quantization was the fastest method, with mean quantization time 0.000084 seconds and mean dequantization time 0.000044 seconds. QTIP bitshift did not dominate either quality or runtime in this experimental configuration.
+Leech Lattice Vector Quantization produced the best reconstruction quality, with SQNR mean 1.937 bits. QuIP\# E8P12 was second best on reconstruction quality, with SQNR mean 1.784 bits. Uniform scalar quantization was the fastest method, with mean quantization time 0.000112 seconds and mean dequantization time 0.000050 seconds. QTIP bitshift did not dominate either quality or runtime in this experimental configuration.
 
 Therefore, the recommended algorithm depends on the objective. If quality is the priority, Leech Lattice Vector Quantization should be selected. If runtime is the priority, especially for quantization and dequantization latency, the uniform scalar quantizer is preferable. Under these measurements, no algorithm is best simultaneously for SQNR, quantization time, and dequantization time.
 
@@ -289,6 +292,12 @@ Albert Tseng, Qingyao Sun, David Hou, and Christopher De Sa.
 \textit{QTIP: Quantization with Trellises and Incoherence Processing}.
 arXiv:2406.11235, 2024.
 \url{https://arxiv.org/abs/2406.11235}
+
+\bibitem{quipsharp}
+Albert Tseng, Jerry Chee, Qingyao Sun, Volodymyr Kuleshov, and Christopher De Sa.
+\textit{QuIP\#: Even Better LLM Quantization with Hadamard Incoherence and Lattice Codebooks}.
+Proceedings of the 41st International Conference on Machine Learning, 2024.
+\url{https://arxiv.org/abs/2402.04396}
 
 \bibitem{qwen3}
 Qwen Team.
