@@ -121,7 +121,14 @@ where \(\mu_k\) is the mean of the results of performing quantization and dequan
 
 \section{Data Collection Protocol}
 
-The experiment was implemented in \texttt{quantizer\_sample\_size\_experiment.ipynb}. All input vectors were actual model-weight blocks from Qwen3-0.6B~\cite{qwen3}.
+The experiment was collected and analyzed using two notebooks:
+
+\begin{center}
+\small\texttt{quantizer\_sample\_collection.ipynb}\\
+\small\texttt{quantizer\_sample\_analysis.ipynb}
+\end{center}
+
+All input vectors were actual model-weight blocks from Qwen3-0.6B~\cite{qwen3}.
 
 The Leech lattice is 24-dimensional, so each experimental block used 24 weights. Each block was formed by flattening a selected weight tensor and taking 24 consecutive weights starting at a sampled tensor-local block index. This was done randomly from each of the 28 layers of the model.
 
@@ -216,10 +223,10 @@ Metric & Scenario & Pilot SD & Min. diff. & Required $n$ \\
 \midrule
 SQNR bits & Two levels symmetric & 0.173003 & 0.10000 & 67 \\
 SQNR bits & One versus rest & 0.173003 & 0.10000 & 45 \\
-Quantize seconds & Two levels symmetric & 0.000253 & 0.10000 & 3 \\
-Quantize seconds & One versus rest & 0.000253 & 0.10000 & 3 \\
-Dequantize seconds & Two levels symmetric & 0.000054 & 0.01000 & 3 \\
-Dequantize seconds & One versus rest & 0.000054 & 0.01000 & 3 \\
+Quantize seconds & Two levels symmetric & 0.000156 & 0.10000 & 2 \\
+Quantize seconds & One versus rest & 0.000156 & 0.10000 & 2 \\
+Dequantize seconds & Two levels symmetric & 0.000039 & 0.01000 & 2 \\
+Dequantize seconds & One versus rest & 0.000039 & 0.01000 & 2 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -265,10 +272,10 @@ Tables~\ref{tab:quantize-time} and~\ref{tab:dequantize-time} summarize runtime. 
 \toprule
 Algorithm & Mean (s) & SD & 95\% CI \\
 \midrule
-Uniform scalar 2-bit & 0.000112 & 0.000059 & [0.000098, 0.000127] \\
-QuIP\# E8P12 & 0.001289 & 0.000183 & [0.001244, 0.001333] \\
-Leech Lattice Vector Quantization & 0.001409 & 0.000241 & [0.001350, 0.001468] \\
-QTIP bitshift & 0.008469 & 0.000260 & [0.008406, 0.008533] \\
+Uniform scalar 2-bit & 0.000087 & 0.000030 & [0.000080, 0.000094] \\
+QuIP\# E8P12 & 0.001138 & 0.000149 & [0.001102, 0.001175] \\
+Leech Lattice Vector Quantization & 0.001372 & 0.000244 & [0.001312, 0.001431] \\
+QTIP bitshift & 0.008523 & 0.000613 & [0.008373, 0.008672] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -281,10 +288,10 @@ QTIP bitshift & 0.008469 & 0.000260 & [0.008406, 0.008533] \\
 \toprule
 Algorithm & Mean (s) & SD & 95\% CI \\
 \midrule
-Uniform scalar 2-bit & 0.000050 & 0.000020 & [0.000045, 0.000054] \\
-QuIP\# E8P12 & 0.000074 & 0.000005 & [0.000073, 0.000076] \\
-QTIP bitshift & 0.000120 & 0.000053 & [0.000107, 0.000133] \\
-Leech Lattice Vector Quantization & 0.000249 & 0.000116 & [0.000220, 0.000277] \\
+Uniform scalar 2-bit & 0.000047 & 0.000005 & [0.000046, 0.000048] \\
+QuIP\# E8P12 & 0.000075 & 0.000017 & [0.000071, 0.000079] \\
+QTIP bitshift & 0.000099 & 0.000019 & [0.000094, 0.000104] \\
+Leech Lattice Vector Quantization & 0.000183 & 0.000050 & [0.000171, 0.000195] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -305,8 +312,8 @@ The ANOVA tests rejected the null hypothesis for all three primary metrics. Tabl
 Metric & Test & Statistic & p-value \\
 \midrule
 SQNR bits & ANOVA & 164.90 & $1.37 \times 10^{-53}$ \\
-Quantize seconds & ANOVA & 27469.27 & $4.34 \times 10^{-259}$ \\
-Dequantize seconds & ANOVA & 124.96 & $1.91 \times 10^{-45}$ \\
+Quantize seconds & ANOVA & 8956.28 & $4.06 \times 10^{-211}$ \\
+Dequantize seconds & ANOVA & 319.90 & $1.22 \times 10^{-75}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -325,8 +332,8 @@ Therefore, the ANOVA results for timing should be interpreted with caution.
 Metric & Test & p-value & Passes $\alpha=0.05$ \\
 \midrule
 SQNR bits & Shapiro-Wilk residual normality & 0.8389 & Yes \\
-Quantize seconds & Shapiro-Wilk residual normality & 0.000107 & No \\
-Dequantize seconds & Shapiro-Wilk residual normality & $6.66 \times 10^{-16}$ & No \\
+Quantize seconds & Shapiro-Wilk residual normality & $1.03 \times 10^{-16}$ & No \\
+Dequantize seconds & Shapiro-Wilk residual normality & $2.32 \times 10^{-18}$ & No \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -367,8 +374,8 @@ Because the timing residuals did not pass the normality check, a Friedman test w
 Metric & Test & Statistic & p-value \\
 \midrule
 SQNR bits & Friedman test & 148.88 & $4.59 \times 10^{-32}$ \\
-Quantize seconds & Friedman test & 188.43 & $1.33 \times 10^{-40}$ \\
-Dequantize seconds & Friedman test & 183.66 & $1.43 \times 10^{-39}$ \\
+Quantize seconds & Friedman test & 189.97 & $6.20 \times 10^{-41}$ \\
+Dequantize seconds & Friedman test & 197.45 & $1.50 \times 10^{-42}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -409,14 +416,14 @@ Quantize seconds & Uniform vs QuIP\# & 0 & $2.02 \times 10^{-11}$ & Uniform \\
 Quantize seconds & Uniform vs QTIP & 0 & $2.02 \times 10^{-11}$ & Uniform \\
 Quantize seconds & Uniform vs Leech & 0 & $2.02 \times 10^{-11}$ & Uniform \\
 Quantize seconds & QuIP\# vs QTIP & 0 & $2.02 \times 10^{-11}$ & QuIP\# \\
-Quantize seconds & QuIP\# vs Leech & 180 & $3.76 \times 10^{-8}$ & QuIP\# \\
+Quantize seconds & QuIP\# vs Leech & 220 & $1.70 \times 10^{-7}$ & QuIP\# \\
 Quantize seconds & QTIP vs Leech & 0 & $2.02 \times 10^{-11}$ & Leech \\
-Dequantize seconds & Uniform vs QuIP\# & 131 & $5.48 \times 10^{-9}$ & Uniform \\
-Dequantize seconds & Uniform vs QTIP & 64 & $3.38 \times 10^{-10}$ & Uniform \\
-Dequantize seconds & Uniform vs Leech & 1 & $2.11 \times 10^{-11}$ & Uniform \\
-Dequantize seconds & QuIP\# vs QTIP & 65 & $3.53 \times 10^{-10}$ & QuIP\# \\
-Dequantize seconds & QuIP\# vs Leech & 59 & $2.73 \times 10^{-10}$ & QuIP\# \\
-Dequantize seconds & QTIP vs Leech & 170 & $2.56 \times 10^{-8}$ & QTIP \\
+Dequantize seconds & Uniform vs QuIP\# & 0 & $2.02 \times 10^{-11}$ & Uniform \\
+Dequantize seconds & Uniform vs QTIP & 0 & $2.02 \times 10^{-11}$ & Uniform \\
+Dequantize seconds & Uniform vs Leech & 0 & $2.02 \times 10^{-11}$ & Uniform \\
+Dequantize seconds & QuIP\# vs QTIP & 66 & $3.68 \times 10^{-10}$ & QuIP\# \\
+Dequantize seconds & QuIP\# vs Leech & 1 & $2.11 \times 10^{-11}$ & QuIP\# \\
+Dequantize seconds & QTIP vs Leech & 0 & $2.02 \times 10^{-11}$ & QTIP \\
 \bottomrule
 \end{tabular}
 }
@@ -453,7 +460,7 @@ the quantize and dequantize metrics were not normal, a friedman test was perform
 Then, post-hoc comparisons were done to determine which one is best for each metric.
 
 Leech Lattice Vector Quantization produced the best reconstruction quality, with SQNR mean 1.937 bits. QuIP\# E8P12 was second best on reconstruction quality, with SQNR mean 1.784 bits.
-Uniform scalar quantization was the fastest method, with mean quantization time 0.000112 seconds and mean dequantization time 0.000050 seconds.
+Uniform scalar quantization was the fastest method, with mean quantization time 0.000087 seconds and mean dequantization time 0.000047 seconds.
 QTIP bitshift did not dominate either quality or runtime in this experimental configuration.
 
 Therefore, the recommended algorithm depends on the objective. If quality is the priority, Leech Lattice Vector Quantization should be selected.

@@ -2,7 +2,7 @@ PWD /home/diego/Documents/master/llm-quantization-benchmarks
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex
+INPUT quantizer_experiment_report.tex
 OUTPUT quantizer_experiment_report.log
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -161,7 +161,6 @@ INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
 INPUT /usr/share/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
-INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/symbols/msam10.tfm
@@ -186,6 +185,7 @@ INPUT ./report_assets/homoscedasticity_residuals_vs_fitted.pdf
 INPUT ./report_assets/homoscedasticity_residuals_vs_fitted.pdf
 INPUT ./report_assets/homoscedasticity_residuals_vs_fitted.pdf
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmti10.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT quantizer_experiment_report.aux
 INPUT ./quantizer_experiment_report.out
 INPUT ./quantizer_experiment_report.out
