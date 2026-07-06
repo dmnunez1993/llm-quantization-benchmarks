@@ -174,7 +174,7 @@ where \(\mu\) is the grand mean and \(\tau_i\) is the effect of algorithm \(i\).
 \]
 
 For each metric and scenario, the minimum sample size per algorithm was calculated using the noncentral F distribution.
-The final experiment used the largest sample size obtained across all metrics and scenarios.
+The final experiment used the largest sample size from all of the runs.
 The target significance level was $\alpha = 0.05$ and the desired power was $0.80$.
 
 The minimum interesting differences selected were:
@@ -184,8 +184,6 @@ The minimum interesting differences selected were:
     \item Quantize time: 0.1 seconds.
     \item Dequantize time: 0.01 seconds. Note how the dequantize time difference is smaller than quantize, as quantize is slower due to searching the vectors in the codebook.
 \end{itemize}
-
-After collecting the final data, descriptive statistics were computed for each metric and algorithm, including mean, standard deviation, coefficient of variation, and 95\% confidence intervals. The global tests used were ANOVA tests. The normality assumption was checked using Shapiro-Wilk tests on ANOVA residuals. Pairwise post-hoc comparisons were performed with Bonferroni correction over all planned metric comparisons.
 
 \subsection{Available Hardware and Software}
 
@@ -431,10 +429,6 @@ The post-hoc comparisons showed the following ordering:
     \item \textbf{Quantize time}: Uniform $<$ QuIP\# $<$ Leech Lattice Vector Quantization $<$ QTIP.
     \item \textbf{Dequantize time}: Uniform $<$ QuIP\# $<$ QTIP $<$ Leech Lattice Vector Quantization.
 \end{itemize}
-
-Seventeen of the eighteen pairwise comparisons were significant after Bonferroni correction. The adjusted alpha was 0.002778. The only non-significant comparison was Uniform scalar 2-bit versus QTIP bitshift for SQNR bits.
-
-The non-parametric post-hoc results show the same pattern as the parametric post-hoc tests. Leech had the best SQNR, Uniform was fastest for quantization and dequantization, and the only non-significant pairwise difference was Uniform versus QTIP for SQNR bits.
 
 \section{Discussion}
 

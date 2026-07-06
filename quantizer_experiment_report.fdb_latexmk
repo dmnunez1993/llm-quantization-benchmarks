@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1783342725.48244 "/home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex" "quantizer_experiment_report.pdf" "quantizer_experiment_report" 1783342725.72075 0
-  "/home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex" 1783342725.08325 24537 d0d71a28586b0121fdfa23bfd3386384 ""
+["pdflatex"] 1783342932.34594 "/home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex" "quantizer_experiment_report.pdf" "quantizer_experiment_report" 1783342932.58014 0
+  "/home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex" 1783342932.18194 23603 b1d79022d8d9fd46feb9a2c5bb7a61d4 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/tcrm1095.tfm" 1136768653 1536 02c06700a42be0f5a28664c7273f82e7 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
@@ -96,9 +96,9 @@
   "/usr/share/texlive/texmf-dist/web2c/texmf.cnf" 1777593600 43785 66587115382950aca692b5f6e3c2fb74 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1781075933 288875 901cd4bbf4b12b5e1bf729e71f403ca5 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1781075914 2299045 e519890c707a0032201c13f9accf508e ""
-  "quantizer_experiment_report.aux" 1783342725.68156 5889 ec941f90b8fa8376040821014ec493bb "pdflatex"
-  "quantizer_experiment_report.out" 1783342725.68256 3241 81779943bd4b0abfb03100d7f3b458b3 "pdflatex"
-  "quantizer_experiment_report.tex" 1783342725.08325 24537 d0d71a28586b0121fdfa23bfd3386384 ""
+  "quantizer_experiment_report.aux" 1783342932.54111 5888 40d1f9640bae2630babf8bf2248b09c7 "pdflatex"
+  "quantizer_experiment_report.out" 1783342932.54111 3241 81779943bd4b0abfb03100d7f3b458b3 "pdflatex"
+  "quantizer_experiment_report.tex" 1783342932.18194 23603 b1d79022d8d9fd46feb9a2c5bb7a61d4 ""
   "report_assets/final_metric_boxplots.pdf" 1783255238.10311 24241 3f3c8af5a433959c2c99c8ca6aa4f597 ""
   "report_assets/homoscedasticity_residuals_vs_fitted.pdf" 1783337996.25128 33641 d8e0600b9a952c372cccb7a7a808af2b ""
   "report_assets/shapiro_residual_qq_plots.pdf" 1783337995.5523 27682 8652c16c32b6e9fa60724abc87333ffa ""
