@@ -7,14 +7,15 @@
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
 \citation{qtip}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Experiment Design}{2}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Metrics used in the experiment}{2}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}SQNR bits}{2}{subsubsection.2.1.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.2}Quantize seconds}{2}{subsubsection.2.1.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.3}Dequantize seconds}{2}{subsubsection.2.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Variables}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Metrics used in the experiment}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}SQNR bits}{2}{subsubsection.2.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Quantize seconds}{2}{subsubsection.2.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.3}Dequantize seconds}{2}{subsubsection.2.2.3}\protected@file@percent }
 \citation{qwen3}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Hypotheses}{3}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Hypotheses}{3}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}Data Collection Protocol}{3}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Data Analysis Protocol}{3}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Data Analysis Protocol}{4}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Available Hardware and Software}{4}{subsection.4.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Actual Experiment}{5}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Sample Size Calculation}{5}{subsection.5.1}\protected@file@percent }
@@ -25,31 +26,32 @@
 \newlabel{fig:boxplots}{{1}{5}{Final metric distributions for the four algorithms. Black points show the mean with 95\% confidence intervals}{figure.1}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Final reconstruction quality statistics.}}{6}{table.2}\protected@file@percent }
 \newlabel{tab:quality}{{2}{6}{Final reconstruction quality statistics}{table.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Final runtime statistics.}}{6}{table.3}\protected@file@percent }
-\newlabel{tab:time}{{3}{6}{Final runtime statistics}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Final quantize-time statistics.}}{6}{table.3}\protected@file@percent }
+\newlabel{tab:quantize-time}{{3}{6}{Final quantize-time statistics}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Final dequantize-time statistics.}}{6}{table.4}\protected@file@percent }
+\newlabel{tab:dequantize-time}{{4}{6}{Final dequantize-time statistics}{table.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Statistical Tests}{6}{subsection.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Global statistical tests on final data.}}{6}{table.4}\protected@file@percent }
-\newlabel{tab:globaltests}{{4}{6}{Global statistical tests on final data}{table.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Normality Check}{6}{subsection.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Shapiro-Wilk residual normality checks.}}{6}{table.5}\protected@file@percent }
-\newlabel{tab:assumptions}{{5}{6}{Shapiro-Wilk residual normality checks}{table.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Normal Q-Q plots of repeated-measures ANOVA residuals for the three primary metrics.}}{7}{figure.2}\protected@file@percent }
-\newlabel{fig:shapiro-qq}{{2}{7}{Normal Q-Q plots of repeated-measures ANOVA residuals for the three primary metrics}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Global statistical tests on final data.}}{6}{table.5}\protected@file@percent }
+\newlabel{tab:globaltests}{{5}{6}{Global statistical tests on final data}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Normality Check}{7}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Shapiro-Wilk residual normality checks.}}{7}{table.6}\protected@file@percent }
+\newlabel{tab:assumptions}{{6}{7}{Shapiro-Wilk residual normality checks}{table.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Normal Q-Q plots of ANOVA residuals for the three primary metrics.}}{7}{figure.2}\protected@file@percent }
+\newlabel{fig:shapiro-qq}{{2}{7}{Normal Q-Q plots of ANOVA residuals for the three primary metrics}{figure.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Homoscedasticity Check}{7}{subsection.5.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Residuals versus fitted values for checking homoscedasticity across the three primary metrics.}}{7}{figure.3}\protected@file@percent }
-\newlabel{fig:homoscedasticity}{{3}{7}{Residuals versus fitted values for checking homoscedasticity across the three primary metrics}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Residuals versus fitted values for checking homoscedasticity across the three primary metrics.}}{8}{figure.3}\protected@file@percent }
+\newlabel{fig:homoscedasticity}{{3}{8}{Residuals versus fitted values for checking homoscedasticity across the three primary metrics}{figure.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Friedman Test}{8}{subsection.5.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Friedman tests on final paired data.}}{8}{table.6}\protected@file@percent }
-\newlabel{tab:friedman}{{6}{8}{Friedman tests on final paired data}{table.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Friedman tests on final paired data.}}{8}{table.7}\protected@file@percent }
+\newlabel{tab:friedman}{{7}{8}{Friedman tests on final paired data}{table.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Post-hoc Comparisons After Friedman Test}{8}{subsection.5.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Bonferroni-corrected Wilcoxon signed-rank post-hoc comparisons.}}{8}{table.7}\protected@file@percent }
-\newlabel{tab:wilcoxon-posthoc}{{7}{8}{Bonferroni-corrected Wilcoxon signed-rank post-hoc comparisons}{table.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Bonferroni-corrected Wilcoxon signed-rank post-hoc comparisons.}}{9}{table.8}\protected@file@percent }
+\newlabel{tab:wilcoxon-posthoc}{{8}{9}{Bonferroni-corrected Wilcoxon signed-rank post-hoc comparisons}{table.8}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{9}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{9}{section.7}\protected@file@percent }
 \bibcite{qtip}{1}
 \bibcite{quipsharp}{2}
 \bibcite{qwen3}{3}
 \bibcite{llvq}{4}
-\bibcite{sphere24}{5}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations}{10}{section.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{10}{section.8}\protected@file@percent }
 \gdef \@abspage@last{10}

@@ -2,7 +2,7 @@ PWD /home/diego/Documents/master/llm-quantization-benchmarks
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT quantizer_experiment_report.tex
+INPUT /home/diego/Documents/master/llm-quantization-benchmarks/quantizer_experiment_report.tex
 OUTPUT quantizer_experiment_report.log
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
